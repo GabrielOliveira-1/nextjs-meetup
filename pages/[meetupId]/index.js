@@ -1,48 +1,62 @@
+import { MongoClient, ObjectId } from "mongodb";
+
 import MeetupDetail from "../../components/meetups/MeetupDetail";
 
-function MeetupDetails() {
+function MeetupDetails(props) {
   return (
     <MeetupDetail
-      image="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/View_from_George_Brown_College%27s_Rooftop_Patio_-_panoramio.jpg/1280px-View_from_George_Brown_College%27s_Rooftop_Patio_-_panoramio.jpg"
-      title="First Meetup"
-      address="123 Street, Toronto"
-      description="Description for the first meetup event"
+      image={props.meetupData.image}
+      title={props.meetupData.title}
+      address={props.meetupData.address}
+      description={props.meetupData.description}
     />
   );
 }
 
 export async function getStaticPaths() {
+  const client = await MongoClient.connect(
+    "mongodb+srv://gabrieldoliveira1:P455WordForMongoDBData@!@cluster0.mkudrv5.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetups");
+
+  const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+
+  client.close();
+
   return {
     fallback: false,
-    paths: [
-      {
-        params: {
-          meetupId: "m1",
-        },
-      },
-      {
-        params: {
-          meetupId: "m2",
-        },
-      },
-    ],
+    paths: meetups.map((meetup) => ({
+      params: { meetupId: meetup._id.toString() },
+    })),
   };
 }
 
 export async function getStaticProps(context) {
   const meetupId = context.params.meetupId;
 
-  console.log(meetupId);
+  const client = await MongoClient.connect(
+    "mongodb+srv://gabrieldoliveira1:P455WordForMongoDBData@!@cluster0.mkudrv5.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetups");
+
+  const selectedMeetup = await meetupsCollection.findOne({
+    _id: ObjectId(meetupId),
+  });
+
+  client.close();
 
   return {
     props: {
       meetupData: {
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/View_from_George_Brown_College%27s_Rooftop_Patio_-_panoramio.jpg/1280px-View_from_George_Brown_College%27s_Rooftop_Patio_-_panoramio.jpg",
-        id: meetupId,
-        title: "First Meetup",
-        address: "123 Street, Toronto",
-        description: "Description for the first meetup event",
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        address: selectedMeetup.address,
+        image: selectedMeetup.image,
+        description: selectedMeetup.description,
       },
     },
   };
