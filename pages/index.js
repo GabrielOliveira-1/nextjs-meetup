@@ -25,18 +25,17 @@ import MeetupList from "../components/meetups/MeetupList";
 
 function HomePage(props) {
   return (
-  <Fragment>
-    <Head>
-      <title>React Meetups</title>
-      <meta
-        name="description"
-        content="browse through a list of meetups app built using react and next.js"
+    <Fragment>
+      <Head>
+        <title>React Meetups</title>
+        <meta
+          name="description"
+          content="Browse through a list of meetups app built using react and next.js"
         />
-    </Head>
-    <MeetupList meetups={props.meetups} />;
-  </Fragment>
-  )
-  
+      </Head>
+      <MeetupList meetups={props.meetups} />;
+    </Fragment>
+  );
 }
 
 // export async function getServerSideProps(context) {
@@ -51,8 +50,9 @@ function HomePage(props) {
 export async function getStaticProps() {
   // fetch data from API
   const client = await MongoClient.connect(
-    "mongodb+srv://gabrieldoliveira1:P455WordForMongoDBData@!@cluster0.mkudrv5.mongodb.net/meetups?retryWrites=true&w=majority"
+    "mongodb+srv://gabrieldoliveira1:raxwvDHEPo9NPQ4Ly@cluster0.mkudrv5.mongodb.net/meetups?retryWrites=true&w=majority"
   );
+
   const db = client.db();
 
   const meetupsCollection = db.collection("meetups");
